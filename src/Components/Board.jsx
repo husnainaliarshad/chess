@@ -2,17 +2,18 @@ import { useState } from 'react';
 import Tile from './Tile.jsx'
 export default function Board() {
     let board = [
-  ['p','p','p','p','p','p','p','p'],
-  ['p','p','p','p','p','p','p','p'],
+  ['br','bn','bb','bk','bq','bb','bn','br'],
+  ['bp','bp','bp','bp','bp','bp','bp','bp'],
   ['-','-','-','-','-','-','-','-'],
   ['-','-','-','-','-','-','-','-'],
   ['-','-','-','-','-','-','-','-'],
   ['-','-','-','-','-','-','-','-'],
-  ['p','p','p','p','p','p','p','p'],
-  ['p','p','p','p','p','p','p','p']
+  ['wp','wp','wp','wp','wp','wp','wp','wp'],
+  ['wr','wn','wb','wk','wq','wb','wn','wr']
 ];
     const [boardState, setBoardState] = useState(board);
-    const [checked, setChecked] = useState([-1,-1]);
+    const [checked, setChecked] = useState([-2,-1]);
+
 
     return ( <>
         <table>
@@ -36,6 +37,8 @@ export default function Board() {
             </tbody>
         </table>
         <p>Checked: ({checked[0]}, {checked[1]})</p>
+        
+       
         </>
     );
 }
