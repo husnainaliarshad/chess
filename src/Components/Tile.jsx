@@ -11,6 +11,7 @@ export default function Tile({ boardState, setBoardState, x, y, checked, setChec
                 setChecked([x, y]);
             }
         }
+
         else if (cx === x && cy === y) { //if this one was previously checked
             if (color(boardState[x][y]) === turn)
             setChecked([-1, -1]); //then uncheck this one
@@ -20,7 +21,12 @@ export default function Tile({ boardState, setBoardState, x, y, checked, setChec
             setTurn(turn * -1)
         }
     }
+    let fileName = boardState[x][y];
+    if (fileName != '-')
+        fileName = fileName[0]  + fileName[1].toUpperCase();
     return (<>
-        <button className={`${(x+y+1)%2 ? "bg-white": "bg-black"} text-blue-700 w-20 h-20`} onClick = {() => {handleClick()}} >{boardState[x][y]} <p className = "text-red-400 text-xs">{x},{y}</p></button>
+        <button className={`${(x+y+1)%2 ? "bg-white": "bg-gray-500"} text-blue-700 w-16 h-16 flex justify-center items-center`} onClick = {() => {handleClick()}} >
+           { boardState[x][y] !=='-'? <img className = "w-15 h-15 " src={`/pieces/${fileName}.svg`} alt={boardState[x][y]} />: ""}
+        </button>
     </>);
 }

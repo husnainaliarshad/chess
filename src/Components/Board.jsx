@@ -17,7 +17,7 @@ export default function Board() {
     const [checked, setChecked] = useState([-2,-1]);
     const [turn, setTurn] = useState(-1);
 
-    return ( <>
+    return ( <div className = "justify-center items-center flex flex-col-reverse">
         <table>
             <tbody>
                 {boardState.map((row, rowIndex) => (
@@ -40,9 +40,10 @@ export default function Board() {
                 ))}
             </tbody>
         </table>
+        
         <p>Checked: ({checked[0]}, {checked[1]})</p>
         <p>Turn : {turn}</p>
-       
-        </>
+        
+        </div>
     );
 }
