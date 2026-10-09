@@ -1,3 +1,5 @@
+import '../App.css'
+
 import { useState } from 'react';
 import Tile from './Tile.jsx'
 export default function Board() {
@@ -13,7 +15,7 @@ export default function Board() {
 ];
     const [boardState, setBoardState] = useState(board);
     const [checked, setChecked] = useState([-2,-1]);
-
+    const [turn, setTurn] = useState(-1);
 
     return ( <>
         <table>
@@ -29,6 +31,8 @@ export default function Board() {
                                     setChecked = {setChecked}
                                     x = {rowIndex}
                                     y = {colIndex}
+                                    turn = {turn}
+                                    setTurn = {setTurn}
                                 /> 
                             </td>
                         ))}
@@ -37,7 +41,7 @@ export default function Board() {
             </tbody>
         </table>
         <p>Checked: ({checked[0]}, {checked[1]})</p>
-        
+        <p>Turn : {turn}</p>
        
         </>
     );

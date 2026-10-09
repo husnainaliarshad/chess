@@ -7,10 +7,20 @@ function mover(boardState, setBoardState, x, y, checked, setChecked) {
     setBoardState(tempState);
     setChecked([-1, -1]);
 }
+export function color(piece) {
+    if (piece[0] === 'w') 
+        return -1;
+    else if (piece[0] === 'b') 
+        return 1;
+    else
+        return 0;
+}
 
-function color(piece) {
-    if (piece[0] == 'w') return -1;
-    else return 1;
+function validMove(boardState, x, y, c, cx, cy) {
+    if (x === cx && y === cy) return null;
+    if (x>7 || y > 7 || x < 0 || y < 0) return null;
+    if (boardState[x][y] === '-' ) return [x,y];
+    else if (color(boardState[x][y]) != c) return [x,y]
 }
 function getPawnMoveSet(boardState, checked, c) {
     let cx = checked[0], cy = checked[1];
@@ -36,7 +46,6 @@ function getPawnMoveSet(boardState, checked, c) {
     return moveSet;
 }
 function getKingMoveSet(boardState, checked, c) {
-
     let moveSet = [];
     let cy = checked[0];
     let cx = checked[1];
@@ -60,57 +69,62 @@ function getKingMoveSet(boardState, checked, c) {
     return moveSet;
 }
 
-function getKnightMoveSet(boardState, checked, color) { console.log("knight") }
-function getQueenMoveSet(boardState, checked, color) { console.log("queen") }
-function getBishopMoveSet(boardState, checked, color) { console.log("bishop") }
-function getRookMoveSet(boardState, checked, c) {
+function getKnightMoveSet(boardState, checked, c) { 
+    let cx = checked[0], cy = checked[1];
+    let set = [[cx+2,cy+1], [cx+2, cy-1], [cx-2,cy+1], [cx-2,cy-1], 
+               [cx+1,cy+2], [cx-1, cy+2], [cx+1,cy-2], [cx-1,cy-2]]  ;
+    let moveSet = [];
+    for (let i of set) {
+        moveSet.push(validMove(boardState, i[0], i[1], c, cx,cy));
+    }
+    console.log(moveSet);
+    return moveSet;
+}
+function go (boardState, checked,c, direction) {
+    // direction is a vector
+    // [0,1] is right, [0,-1] is left
+    // [1, 0] is down, [-1,0] is up
+    // [1,1]/[-1,-1] is the y = -x looking diagonal
+    // [-1,1]/[1,-1] is the y =  x looking diagonal
+    let moveSet = [];
+    let cx = checked[0], cy = checked[1];
+    let dx = direction[0], dy = direction[1];
+    
+    for (let start = [cx,cy]; start[0] < 8 && start[1] < 8 && start[0] >= 0 && start[1] >= 0; start = [start[0]+dx, start[1]+dy]) {
+        moveSet.push(validMove(boardState, start[0], start[1], c, cx, cy));
+        if (JSON.stringify(start) !== JSON.stringify([cx,cy]) && color(boardState[start[0]][start[1]]) !== 0) break;
+    }
+    return moveSet;
+}
+function getQueenMoveSet(boardState, checked, c) {
     let moveSet = [];
     let cx = checked[0], cy = checked[1];
 
-    // Right
-    for (let x = cx + 1; x < 8; x++) {
-        if (boardState[x][cy] === '-') {
-            moveSet.push([x, cy]);
-        } else {
-            if (color(boardState[x][cy]) !== c)
-                moveSet.push([x, cy]);
-            break;
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            if (i === 0 && j === 0) continue;
+            let a = go(boardState, checked, c, [i,j]);
+            moveSet.push(...a);            
         }
     }
-
-    // Left
-    for (let x = cx - 1; x >= 0; x--) {
-        if (boardState[x][cy] === '-') {
-            moveSet.push([x, cy]);
-        } else {
-            if (color(boardState[x][cy]) !== c)
-                moveSet.push([x, cy]);
-            break;
-        }
-    }
-
-    // Up
-    for (let y = cy + 1; y < 8; y++) {
-        if (boardState[cx][y] === '-') {
-            moveSet.push([cx, y]);
-        } else {
-            if (color(boardState[cx][y]) !== c)
-                moveSet.push([cx, y]);
-            break;
-        }
-    }
-
-    // Down
-    for (let y = cy - 1; y >= 0; y--) {
-        if (boardState[cx][y] === '-') {
-            moveSet.push([cx, y]);
-        } else {
-            if (color(boardState[cx][y]) !== c)
-                moveSet.push([cx, y]);
-            break;
-        }
-    }
-
+    return moveSet;
+}
+function getBishopMoveSet(boardState, checked, c) { 
+    let moveSet = [];
+    let cx = checked[0], cy = checked[1];
+    moveSet.push(...go(boardState,checked, c, [-1, -1]))
+    moveSet.push(...go(boardState,checked, c, [1, -1]))
+    moveSet.push(...go(boardState,checked, c, [-1, 1]))
+    moveSet.push(...go(boardState,checked, c, [1, 1]))
+    return moveSet;
+ }
+function getRookMoveSet(boardState, checked, c) {
+   let moveSet = [];
+    let cx = checked[0], cy = checked[1];
+    moveSet.push(...go(boardState,checked, c, [-1, 0]))
+    moveSet.push(...go(boardState,checked, c, [1, 0]))
+    moveSet.push(...go(boardState,checked, c, [0, 1]))
+    moveSet.push(...go(boardState,checked, c, [0, -1]))
     return moveSet;
 }
 
@@ -132,7 +146,7 @@ export function Move(boardState, setBoardState, x, y, checked, setChecked) {
         moveSet = getKingMoveSet(boardState, checked, color(boardState[cx][cy]));
 
     for (let thismove of moveSet) {
-        if (thismove[0] === x && thismove[1] === y) {
+        if (thismove && thismove[0] === x && thismove[1] === y) {
             mover(boardState, setBoardState, x, y, checked, setChecked);
             break;
         }
